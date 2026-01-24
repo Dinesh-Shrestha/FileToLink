@@ -67,6 +67,8 @@ class Var:
         logger.critical("DATABASE_URL is required")
         raise ValueError("DATABASE_URL is required")
 
+    UPSTREAM_REPO: str = os.getenv("UPSTREAM_REPO", "https://github.com/Dinesh-Shrestha/FileToLink")
+
     MAX_BATCH_FILES: int = int(os.getenv("MAX_BATCH_FILES", "50"))
 
     CHANNEL: bool = str_to_bool(os.getenv("CHANNEL", "False"))

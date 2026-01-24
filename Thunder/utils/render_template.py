@@ -46,7 +46,8 @@ async def render_page(id: int, secure_hash: str, requested_action: str | None = 
             context = {
                 'heading': f"View {safe_filename}",
                 'file_name': safe_filename,
-                'src': src
+                'src': src,
+                'upstream_repo': Var.UPSTREAM_REPO
             }
         else:
             template = template_env.get_template('dl.html')

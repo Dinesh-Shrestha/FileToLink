@@ -14,6 +14,7 @@ from Thunder.utils.custom_dl import ByteStreamer
 from Thunder.utils.logger import logger
 from Thunder.utils.render_template import render_page
 from Thunder.utils.time_format import get_readable_time
+from Thunder.vars import Var
 
 routes = web.RouteTableDef()
 
@@ -123,7 +124,7 @@ def parse_range_header(range_header: str, file_size: int) -> tuple[int, int]:
 
 @routes.get("/", allow_head=True)
 async def root_redirect(request):
-    raise web.HTTPFound("https://github.com/fyaz05/FileToLink")
+    raise web.HTTPFound(Var.UPSTREAM_REPO)
 
 
 @routes.get("/status", allow_head=True)
