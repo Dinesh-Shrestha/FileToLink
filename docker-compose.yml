@@ -1,0 +1,27 @@
+services:
+  mongo:
+    image: mongo:6
+    container_name: thunderlink-mongo
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  bot:
+    build: .
+    container_name: thunderlink-bot
+    ports:
+      - "8080:8080"
+    env_file:
+      - config.env
+    depends_on:
+      mongo:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  mongo_data:

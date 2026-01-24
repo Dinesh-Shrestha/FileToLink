@@ -293,6 +293,7 @@ MSG_BROADCAST_USAGE = (
 # =====================================================================================
 
 MSG_ERROR_UNAUTHORIZED = "You are not authorized to view this information."
+MSG_ERROR_PRIVATE_ACCESS = "🔒 **Private Mode Active**\n\nThis bot is in private mode. Contact the owner if you think this is a mistake."
 MSG_ERROR_BROADCAST_RESTART = "Please use the /broadcast command to start a new broadcast."
 MSG_ERROR_BROADCAST_INSTRUCTION = "To start a new broadcast, use the /broadcast command and reply to the message you want to broadcast."
 MSG_ERROR_CALLBACK_UNSUPPORTED = "This button is not active or no longer supported."

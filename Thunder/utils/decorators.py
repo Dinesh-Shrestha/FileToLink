@@ -62,7 +62,18 @@ async def require_token(client, message: Message):
             return True
 
         user_id = message.from_user.id
-        if user_id == Var.OWNER_ID or await allowed(user_id) or await check(user_id):
+        if user_id == Var.OWNER_ID or await allowed(user_id):
+            return True
+
+        if getattr(Var, "PRIVATE_MODE", False):
+            try:
+                await message.reply_text(MSG_ERROR_PRIVATE_ACCESS, quote=True)
+            except FloodWait as e:
+                await asyncio.sleep(e.value)
+                await message.reply_text(MSG_ERROR_PRIVATE_ACCESS, quote=True)
+            return False
+
+        if await check(user_id):
             return True
 
         temp_token_string = None

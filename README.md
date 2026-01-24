@@ -120,6 +120,7 @@ Copy `config_sample.env` to `config.env` and fill in your values.
 | `HAS_SSL` | HTTPS enabled | `True` or `False` |
 | `PORT` | Server port | `8080` |
 | `NO_PORT` | Hide port in URLs | `True` or `False` |
+| `PRIVATE_MODE` | Restrict bot to owner/authorized only | `True` or `False` |
 
 ### Optional Configuration
 
@@ -307,6 +308,21 @@ nano config.env  # Edit your settings
 # 3. Build and run
 docker build -t thunder .
 docker run -d --name thunder -p 8080:8080 thunder
+```
+
+#### Docker Compose (Recommended for stability)
+
+```bash
+# 1. Clone repository
+git clone https://github.com/Dinesh-Shrestha/FileToLink.git
+cd FileToLink
+
+# 2. Configure
+cp config_sample.env config.env
+nano config.env  # Set your variables and DB URL
+
+# 3. Run with Compose
+docker compose up -d
 ```
 
 <details>
