@@ -1,6 +1,7 @@
 # Thunder/utils/file_properties.py
 
 import asyncio
+import re
 from datetime import datetime as dt
 from typing import Any, Optional
 
@@ -46,31 +47,70 @@ def parse_fid(message: Message) -> Optional[FileId]:
     return None
 
 
+def clean_fname(name: str) -> str:
+    if not name:
+        return ""
+    # Take the first line and remove leading/trailing whitespace
+    name = name.split('\n')[0].strip()
+    # Remove Telegram @usernames, URLs, and common promotional suffixes
+    name = re.sub(r'(@[a-zA-Z0-9_]+)', '', name)
+    name = re.sub(r'https?://[^\s]+', '', name)
+    # Remove problematic characters for filenames but keep dots/dashes
+    name = re.sub(r'[\\/:*?"<>|]', '', name)
+    # Clean up double spaces or dots that might result from removals
+    name = re.sub(r'\s+', ' ', name).strip()
+    return name
+
+
 def get_fname(msg: Message) -> str:
     media = get_media(msg)
-    fname = getattr(media, 'file_name', None) if media else None
+    if not media:
+        return f"file_{dt.now().strftime('%Y%m%d%H%M%S')}.bin"
 
+    # Try internal filename first
+    internal_name = getattr(media, 'file_name', None)
+    # Try caption as a fallback (often better for forwarded/leeched files)
+    caption_name = clean_fname(msg.caption) if msg.caption else None
+
+    # Use caption if internal name is missing or seems truncated/inferior
+    if caption_name and (not internal_name or len(caption_name) > len(internal_name)):
+        fname = caption_name
+    else:
+        fname = internal_name
+
+    # Ensure we have a valid name or use a timestamp
     if not fname:
         ext = "bin"
-        if media:
-            media_types = {
-                "photo": "jpg",
-                "audio": "mp3",
-                "voice": "ogg",
-                "video": "mp4",
-                "animation": "mp4",
-                "video_note": "mp4",
-                "sticker": "webp"
-            }
+        media_types = {
+            "photo": "jpg",
+            "audio": "mp3",
+            "voice": "ogg",
+            "video": "mp4",
+            "animation": "mp4",
+            "video_note": "mp4",
+            "sticker": "webp"
+        }
+        for attr, extension in media_types.items():
+            if getattr(msg, attr, None) is not None:
+                ext = extension
+                break
+        fname = f"Thunder_{dt.now().strftime('%Y%m%d%H%M%S')}.{ext}"
 
-            # Check which attribute type the message has
-            for attr, extension in media_types.items():
-                if getattr(msg, attr, None) is not None:
-                    ext = extension
-                    break
-
-        timestamp = dt.now().strftime("%Y%m%d%H%M%S")
-        fname = f"Thunder File To Link_{timestamp}.{ext}"
+    # Final check: if the name is from caption and missing extension, add it
+    if "." not in fname[-5:]:
+        media_type = type(media).__name__.lower()
+        ext_map = {
+            "photo": ".jpg",
+            "audio": ".mp3",
+            "voice": ".ogg",
+            "video": ".mp4",
+            "animation": ".mp4",
+            "videonote": ".mp4",
+            "sticker": ".webp"
+        }
+        ext = ext_map.get(media_type, "")
+        if ext and not fname.lower().endswith(ext):
+            fname += ext
 
     return fname
 

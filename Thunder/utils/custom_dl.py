@@ -8,7 +8,7 @@ from pyrogram.errors import FloodWait
 from pyrogram.types import Message
 
 from Thunder.server.exceptions import FileNotFound
-from Thunder.utils.file_properties import get_media
+from Thunder.utils.file_properties import get_media, get_fname
 from Thunder.utils.logger import logger
 from Thunder.vars import Var
 
@@ -64,21 +64,8 @@ class ByteStreamer:
             return {"message_id": message.id, "error": "No media"}
 
         media_type = type(media).__name__.lower()
-        file_name = getattr(media, 'file_name', None)
+        file_name = get_fname(message)
         mime_type = getattr(media, 'mime_type', None)
-
-        if not file_name:
-            ext_map = {
-                "photo": "jpg",
-                "audio": "mp3",
-                "voice": "ogg",
-                "video": "mp4",
-                "animation": "mp4",
-                "videonote": "mp4",
-                "sticker": "webp",
-            }
-            ext = ext_map.get(media_type, "bin")
-            file_name = f"Thunder_{message.id}.{ext}"
 
         if not mime_type:
             mime_map = {
